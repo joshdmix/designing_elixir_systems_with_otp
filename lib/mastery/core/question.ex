@@ -1,6 +1,5 @@
 defmodule Mastery.Core.Question do
   alias Mastery.Core.Template
-
   defstruct ~w[asked substitutions template]a
 
   def new(%Template{} = template) do
@@ -20,8 +19,7 @@ defmodule Mastery.Core.Question do
   end
 
   defp compile(template, substitutions) do
-    template.compiled
-    |> Code.eval_quoted(assigns: substitutions) |> elem(0)
+    template.compiled |> Code.eval_quoted(assigns: substitutions) |> elem(0)
   end
 
   defp evaluate(substitutions, template) do

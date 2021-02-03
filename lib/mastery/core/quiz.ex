@@ -10,7 +10,6 @@ defmodule Mastery.Core.Quiz do
             record: %{},
             mastered: []
 
-
   def new(fields) do
     struct!(__MODULE__, fields)
   end
@@ -23,10 +22,10 @@ defmodule Mastery.Core.Quiz do
   end
 
   def select_question(%__MODULE__{templates: t}) when map_size(t) == 0, do: nil
+
   def select_question(quiz) do
     quiz |> pick_current_question |> move_template(:used) |> reset_template_cycle
   end
-
 
   def answer_question(quiz, %Response{correct: true} = response) do
     new_quiz = quiz |> inc_record |> save_response(response)
@@ -45,12 +44,13 @@ defmodule Mastery.Core.Quiz do
     score = Map.get(quiz.record, template(quiz).name, 0)
     score == quiz.mastery
   end
-  defp  pick_current_question(quiz) do
+
+  defp pick_current_question(quiz) do
     Map.put(quiz, :current_question, select_a_random_question(quiz))
   end
 
   defp select_a_random_question(quiz) do
-    quiz.templates |> Enum.random |> elem(1) |> Enum.random |> Question.new
+    quiz.templates |> Enum.random() |> elem(1) |> Enum.random() |> Question.new()
   end
 
   defp move_template(quiz, field) do
@@ -65,27 +65,33 @@ defmodule Mastery.Core.Quiz do
   end
 
   defp reset_template_cycle(%{templates: templates, used: used} = quiz)
-  when map_size(templates) == 0 do
+       when map_size(templates) == 0 do
     %__MODULE__{
-      quiz | templates: Enum.group_by(used, fn template -> template.category end),
-      used: []
+      quiz
+      | templates: Enum.group_by(used, fn template -> template.category end),
+        used: []
     }
   end
+
   defp reset_template_cycle(quiz), do: quiz
 
   defp remove_template_from_category(quiz) do
     template = template(quiz)
-    new_category_templates = quiz.templates |> Map.fetch!(template.category) |> List.delete(template)
-    new_templates = if new_category_templates == [] do
-      Map.delete(quiz.templates, template.category)
-    else
-      Map.put(quiz.templates, template.category, new_category_templates)
-    end
+
+    new_category_templates =
+      quiz.templates |> Map.fetch!(template.category) |> List.delete(template)
+
+    new_templates =
+      if new_category_templates == [] do
+        Map.delete(quiz.templates, template.category)
+      else
+        Map.put(quiz.templates, template.category, new_category_templates)
+      end
+
     Map.put(quiz, :templates, new_templates)
   end
 
   defp template(quiz), do: quiz.current_question.template
-
 
   defp add_to_list_or_nil(nil, template), do: [template]
   defp add_to_list_or_nil(templates, template), do: [template | templates]
