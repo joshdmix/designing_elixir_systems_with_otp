@@ -66,4 +66,8 @@ defmodule Mastery.Boundary.QuizSession do
       {Mastery.Registry.QuizSession, name}
     }
   end
+
+  def active_sessions_for(quiz_title) do
+    Mastery.Supervisor.QuizSession |> DynamicSupervisor.which_children |> Enum.filter(&child_pid?/1) |> Enum.flat_map(&active_sessions(&1, quiz_title))
+  end
 end
