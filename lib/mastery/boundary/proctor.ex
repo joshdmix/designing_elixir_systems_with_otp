@@ -47,13 +47,15 @@ defmodule Mastery.Boundary.Proctor do
   end
 
   defp start_quizzes(quizzes, now) do
-    {ready, not_ready} = Enum.split_while(quizzes, fn quiz -> date_time_less_than_or_equal?(quiz.start_at, now) end)
-    Enum.each(ready, fn quiz -> start_quiz(quiz, now)  end)
+    {ready, not_ready} =
+      Enum.split_while(quizzes, fn quiz -> date_time_less_than_or_equal?(quiz.start_at, now) end)
+
+    Enum.each(ready, fn quiz -> start_quiz(quiz, now) end)
     not_ready
   end
 
   def start_quiz(quiz, now) do
-    Logger.info "Starting quiz #{quiz.fields.title}..."
+    Logger.info("Starting quiz #{quiz.fields.title}...")
     QuizManager.build_quiz(quiz.fields)
     Enum.each(quiz.templates, &Mastery.add_template(quiz, &1))
     timeout = DateTime.diff(quiz.end_at, now, :millisecond)
@@ -65,15 +67,15 @@ defmodule Mastery.Boundary.Proctor do
   end
 
   def handle_info(:timeout, quizzes) do
-    now = DateTime.utc_now
+    now = DateTime.utc_now()
     remaining_quizzes = start_quizzes(quizzes, now)
     build_reply_with_timeout({:noreply}, remaining_quizzes, now)
   end
 
   def handle_info({:end_quiz, title}, quizzes) do
     QuizManager.remove_quiz(title)
-    title |> QuizSession.active_sessions_for |> QuizSession.end_sessions
-    Logger.info "Stopped quiz #{title}."
+    title |> QuizSession.active_sessions_for() |> QuizSession.end_sessions()
+    Logger.info("Stopped quiz #{title}.")
     handle_info(:timeout, quizzes)
   end
 end
