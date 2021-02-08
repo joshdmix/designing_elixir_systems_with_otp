@@ -11,13 +11,14 @@ defmodule ProctorTest do
     now = DateTime.utc_now()
     email = "student@example.com"
 
-    assert :ok == Mastery.schedule_quiz(
-      quiz,
-      [Math.template_fields],
-      DateTime.add(now, 50: milliseconds),
-      DateTime.add(now, 100, :millisecond),
-      self()
-    )
+    assert :ok ==
+             Mastery.schedule_quiz(
+               quiz,
+               [Math.template_fields()],
+               DateTime.add(now, 50, :milliseconds),
+               DateTime.add(now, 100, :millisecond),
+               self()
+             )
 
     refute Mastery.take_quiz(quiz.title, email)
 

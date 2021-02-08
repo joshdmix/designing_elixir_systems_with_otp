@@ -53,7 +53,7 @@ defmodule MasteryTest do
       template_fields(generators: addition_generators([1], [2]))
     ]
 
-    assert "" != ExUnit.CaptureLog.capture_log(fn -> :ok = start_quiz(alaways_add_1_to_2) end)
+    assert "" != ExUnit.CaptureLog.capture_log(fn -> :ok = start_quiz(always_add_1_to_2) end)
     :ok
   end
 

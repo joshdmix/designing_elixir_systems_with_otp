@@ -22,7 +22,7 @@ defmodule Mastery.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:mastery_persistence, path: "../mastery_persistence"}
+      {:mastery_persistence, path: "mastery_persistence"}
     ]
   end
 end

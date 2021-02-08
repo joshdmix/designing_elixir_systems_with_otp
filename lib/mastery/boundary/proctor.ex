@@ -74,7 +74,7 @@ defmodule Mastery.Boundary.Proctor do
     build_reply_with_timeout({:noreply}, remaining_quizzes, now)
   end
 
-  def handle_info({:end_quiz, title}, quizzes) do
+  def handle_info({:end_quiz, title, notify_pid}, quizzes) do
     QuizManager.remove_quiz(title)
     title |> QuizSession.active_sessions_for() |> QuizSession.end_sessions()
     Logger.info("Stopped quiz #{title}.")
@@ -83,11 +83,11 @@ defmodule Mastery.Boundary.Proctor do
   end
 
   defp notify_start(%{notify_pid: nil}), do: nil
+
   defp notify_start(quiz) do
     send(quiz.notify_pid, {:started, quiz.fields.title})
   end
 
-  defp notify_stopped(nil, _title), : nil
+  defp notify_stopped(nil, _title), do: nil
   defp notify_stopped(pid, title), do: send(pid, {:stopped, title})
-
 end
